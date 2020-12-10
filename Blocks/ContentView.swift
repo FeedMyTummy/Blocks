@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State var currentDate = Date()
+    @State private var currentDate = Date()
     
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     private let blockViewWidth: CGFloat = 300
@@ -29,17 +29,16 @@ struct ContentView: View {
             }
     }
     
-    static func mockBlock() -> WBlock {
+    private static func mockBlock() -> WBlock {
+        let time: WBlock.BlockTime
         
-            let time: WBlock.BlockTime
-            
-            if Bool.random() {
-                 time = .past(Calendar.current.date(byAdding: .minute,
-                                                    value: 0,
-                                                    to: Date())!)
-            } else {
-                time = .upcoming(Int.random(in: 1...3))
-            }
+        if Bool.random() {
+            time = .past(Calendar.current.date(byAdding: .minute,
+                                               value: 0,
+                                               to: Date())!)
+        } else {
+            time = .upcoming(Int.random(in: 1...3))
+        }
         
         return WBlock(height: Int.random(in: 100_000...500_000),
                       transactionCount: Int.random(in: 1000...3000),

@@ -64,36 +64,35 @@ fileprivate struct BlockView: View {
     private let waveDuration: Double
     private let cornerRadius: CGFloat
     
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
-        RoundedRectangle(cornerRadius: cornerRadius)
-            .stroke(colorScheme == .dark ? Color.gray : .black, lineWidth: 1)
-            .overlay(
-                WWave(offset: waveOffset, fractionFilled: blockViewModel.fractionFilled, height: waveHeight)
-                    .fill(
-                        Color(red: 0,
-                              green: 0.5,
-                              blue: 0.75,
-                              opacity: colorScheme == .dark ? 1 : 0.5)
-                    )
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .scale(1)
-                    )
-                    .background(
-                        (colorScheme == .dark ? Color.black : .white)
-                            .clipShape(
-                                RoundedRectangle(cornerRadius: cornerRadius)
-                            )
-                    )
-            )
-            .aspectRatio(1, contentMode: .fit)
-            .onAppear {
-                withAnimation(Animation.linear(duration: 2).repeatForever(autoreverses: false)) {
-                    self.waveOffset = Angle(degrees: 360)
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(colorScheme == .dark ? Color.black : .white)
+            
+            WWave(offset: waveOffset, fractionFilled: blockViewModel.fractionFilled, height: waveHeight)
+                .fill(
+                    Color(red: 0,
+                          green: 0.5,
+                          blue: 0.75,
+                          opacity: colorScheme == .dark ? 1 : 0.5)
+                ).clipShape(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                )
+                .onAppear {
+                    withAnimation(
+                        Animation.linear(duration: 2)
+                                    .repeatForever(autoreverses: false)
+                    ) {
+                        self.waveOffset = Angle(degrees: 360)
+                    }
                 }
-            }
+            
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(colorScheme == .dark ? Color.gray : .black, lineWidth: 1)
+        }
+        .aspectRatio(1, contentMode: .fit)
     }
     
     init(block: WBlockViewModel, waveHeight: CGFloat, waveDuration: Double, cornerRadius: CGFloat) {
