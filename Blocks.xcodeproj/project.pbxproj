@@ -14,6 +14,7 @@
 		84F1C76725802205004C2210 /* WBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1C76625802205004C2210 /* WBlock.swift */; };
 		84F1C76E25802310004C2210 /* WWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1C76D25802310004C2210 /* WWave.swift */; };
 		84F1C77225802A18004C2210 /* WBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1C77125802A18004C2210 /* WBlockView.swift */; };
+		84FE71DE258173CA00C1470A /* WBlockViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FE71DD258173CA00C1470A /* WBlockViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		84F1C76625802205004C2210 /* WBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBlock.swift; sourceTree = "<group>"; };
 		84F1C76D25802310004C2210 /* WWave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WWave.swift; sourceTree = "<group>"; };
 		84F1C77125802A18004C2210 /* WBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBlockView.swift; sourceTree = "<group>"; };
+		84FE71DD258173CA00C1470A /* WBlockViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WBlockViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +60,7 @@
 		84ABD183257F3C8B00F4D4EB /* Blocks */ = {
 			isa = PBXGroup;
 			children = (
+				84FE71DC258173BB00C1470A /* View Models */,
 				84F1C765258021E7004C2210 /* Models */,
 				84F1C76C258022E4004C2210 /* Views */,
 				84ABD184257F3C8B00F4D4EB /* BlocksApp.swift */,
@@ -92,6 +95,14 @@
 				84F1C77125802A18004C2210 /* WBlockView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		84FE71DC258173BB00C1470A /* View Models */ = {
+			isa = PBXGroup;
+			children = (
+				84FE71DD258173CA00C1470A /* WBlockViewModel.swift */,
+			);
+			path = "View Models";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,6 +178,7 @@
 				84ABD185257F3C8B00F4D4EB /* BlocksApp.swift in Sources */,
 				84F1C76725802205004C2210 /* WBlock.swift in Sources */,
 				84F1C77225802A18004C2210 /* WBlockView.swift in Sources */,
+				84FE71DE258173CA00C1470A /* WBlockViewModel.swift in Sources */,
 				84F1C76E25802310004C2210 /* WWave.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

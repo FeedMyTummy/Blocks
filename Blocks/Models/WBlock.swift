@@ -9,22 +9,27 @@ import Foundation
 
 struct WBlock {
     
+    enum BlockTime {
+        case past(Date)
+        case upcoming(Int)
+    }
+    
     let height: Int
     let averageFee: Int
     let transactionCount: Int
     let feeRange: (min: Int, max: Int)
-    let size: Double
+    let sizeInBytes: Int
     let weight: Double
+    let time: BlockTime
     
-    static let weightLimit = 4_000_000.0
-    
-    init(height: Int, transactionCount: Int, averageFee: Int, feeRange: (min: Int, max: Int), sizeMB: Double, weight: Double) {
+    init(height: Int, transactionCount: Int, averageFee: Int, feeRange: (min: Int, max: Int), sizeInBytes: Int, weight: Double, time: BlockTime) {
         self.height = height
         self.transactionCount = transactionCount
         self.averageFee = averageFee
         self.feeRange = feeRange
-        self.size = sizeMB
-        self.weight = weight / WBlock.weightLimit
+        self.sizeInBytes = sizeInBytes
+        self.weight = weight
+        self.time = time
     }
     
 }
