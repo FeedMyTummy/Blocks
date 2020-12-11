@@ -10,27 +10,28 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var currentDate = Date()
-    @State private var animate = true
+    @StateObject private var blockViewModel = WBlockViewModel(block: mockBlock())
     
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     private let blockViewWidth: CGFloat = 300
-    private let blockViewModel = WBlockViewModel(block: mockBlock())
     
     var body: some View {
         VStack(spacing: 10) {
-            Toggle("Toggle animation", isOn: $animate)
-                .labelsHidden()
+            Button("\(blockViewModel.animate ? "Stop" : "Start") animating") {
+                blockViewModel.animate.toggle()
+            }
             .padding(.bottom, 20)
             
             WBlockView(blockViewModel: blockViewModel,
-                       currentDate: currentDate,
-                       animate: animate)
+                       currentDate: currentDate)
             
                 .frame(width: blockViewWidth, height: blockViewWidth)
-                .onReceive(timer) { _ in
-                    currentDate = Date()
-                }
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                .onReceive(timer) { _ in currentDate = Date() }
+                .onReceive(NotificationCenter
+                            .default
+                            .publisher(for: UIApplication
+                                        .willEnterForegroundNotification))
+                { _ in
                     currentDate = Date()
                 }
         }

@@ -11,7 +11,6 @@ struct WBlockView: View {
     
     private let blockViewModel: WBlockViewModel
     private let currentDate: Date
-    private let animate: Bool
     
     // MARK: Constants
     private let configuration = BlockViewConfiguration(waveHeight: 0.02,
@@ -23,8 +22,7 @@ struct WBlockView: View {
             BlockHeightText(height: blockViewModel.block.height)
             ZStack {
                 BlockBodyView(block: blockViewModel,
-                          configuration: configuration,
-                          animate: animate)
+                          configuration: configuration)
                 
                 BlockTextView(blockViewModel: blockViewModel, currentDate: currentDate)
             }
@@ -33,10 +31,9 @@ struct WBlockView: View {
         .multilineTextAlignment(.center)
     }
     
-    init(blockViewModel: WBlockViewModel, currentDate: Date, animate: Bool) {
+    init(blockViewModel: WBlockViewModel, currentDate: Date) {
         self.blockViewModel = blockViewModel
         self.currentDate = currentDate
-        self.animate = animate
     }
 }
 
@@ -69,20 +66,19 @@ fileprivate struct BlockBodyView: View {
     
     @Environment(\.colorScheme) private var colorScheme
     @State private var waveOffset = Angle.zero
+    @ObservedObject private var blockViewModel: WBlockViewModel
     
-    private let blockViewModel: WBlockViewModel
     private let configuration: BlockViewConfiguration
-    private let animate: Bool
     
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: configuration.cornerRadius)
-                .fill(colorScheme == .dark ? Color.black : .white )
+                .fill(colorScheme == .dark ? Color.black : .white)
             
             WWave(offset: waveOffset, fractionFilled: blockViewModel.fractionFilled, height: configuration.waveHeight)
                 .fill(Color("block-wave-color"))
                 .clipShape(RoundedRectangle(cornerRadius: configuration.cornerRadius))
-                .onChange(of: animate) { _ in runAnimation() }
+                .onChange(of: blockViewModel.animate) { _ in runAnimation() }
                 .onAppear { runAnimation() }
             
             RoundedRectangle(cornerRadius: configuration.cornerRadius)
@@ -93,19 +89,18 @@ fileprivate struct BlockBodyView: View {
     
     func runAnimation() {
         withAnimation(
-            animate
+            blockViewModel.animate
                 ? Animation.linear(duration: 2)
                            .repeatForever(autoreverses: false)
                 : .linear(duration: 0))
         {
-            waveOffset = Angle(degrees: animate ? 360 : .zero)
+            waveOffset = Angle(degrees: blockViewModel.animate ? 360 : .zero)
         }
     }
     
-    init(block: WBlockViewModel, configuration: BlockViewConfiguration, animate: Bool) {
+    init(block: WBlockViewModel, configuration: BlockViewConfiguration) {
         self.blockViewModel = block
         self.configuration = configuration
-        self.animate = animate
     }
 }
 
@@ -146,7 +141,6 @@ struct BlockView_Previews: PreviewProvider {
     
     static var previews: some View {
         let blockViewWidth: CGFloat = 300
-        let animate = true
         
         let time: WBlock.BlockTime
         
@@ -169,8 +163,7 @@ struct BlockView_Previews: PreviewProvider {
         
         return Group {
             WBlockView(blockViewModel: WBlockViewModel(block: block),
-                       currentDate: currentDate,
-                       animate: animate)
+                       currentDate: currentDate)
                 
                 .frame(width: blockViewWidth,
                        height: blockViewWidth)
@@ -178,8 +171,7 @@ struct BlockView_Previews: PreviewProvider {
                 .preferredColorScheme(.light)
             
             WBlockView(blockViewModel: WBlockViewModel(block: block),
-                       currentDate: currentDate,
-                       animate: animate)
+                       currentDate: currentDate)
                 .frame(width: blockViewWidth,
                        height: blockViewWidth)
                 .previewLayout(.sizeThatFits)

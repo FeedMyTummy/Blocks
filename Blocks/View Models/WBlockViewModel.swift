@@ -7,9 +7,10 @@
 
 import Foundation
 
-final class WBlockViewModel {
+final class WBlockViewModel: ObservableObject {
     
     let block: WBlock
+    @Published var animate = false
     var fractionFilled: Double { block.weight / WBlockViewModel.weightLimit }
     var sizeInMegabytes: Double { Double(block.sizeInBytes) / 1_000_000 }
     
