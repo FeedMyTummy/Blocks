@@ -10,23 +10,30 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var currentDate = Date()
+    @State private var animate = true
     
     private let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     private let blockViewWidth: CGFloat = 300
-    private let block = mockBlock()
+    private let blockViewModel = WBlockViewModel(block: mockBlock())
     
     var body: some View {
-        WBlockView(blockViewModel: WBlockViewModel(block: block),
-                   waveHeight: 0.025,
-                   waveDuration: 2,
-                   currentDate: currentDate)
-            .frame(width: blockViewWidth, height: blockViewWidth)
-            .onReceive(timer) { _ in
-                currentDate = Date()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                currentDate = Date()
-            }
+        VStack(spacing: 10) {
+            Toggle("Toggle animation", isOn: $animate)
+                .labelsHidden()
+            .padding(.bottom, 20)
+            
+            WBlockView(blockViewModel: blockViewModel,
+                       currentDate: currentDate,
+                       animate: animate)
+            
+                .frame(width: blockViewWidth, height: blockViewWidth)
+                .onReceive(timer) { _ in
+                    currentDate = Date()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    currentDate = Date()
+                }
+        }
     }
     
     private static func mockBlock() -> WBlock {

@@ -10,19 +10,21 @@ import SwiftUI
 struct WBlockView: View {
     
     private let blockViewModel: WBlockViewModel
-    private let waveHeight: CGFloat
-    private let waveDuration: Double
-    private let cornerRadius: CGFloat = 10
     private let currentDate: Date
+    private let animate: Bool
+    
+    // MARK: Constants
+    private let configuration = BlockViewConfiguration(waveHeight: 0.02,
+                                                       waveDuration: 1.0,
+                                                       cornerRadius: 10)
     
     var body: some View {
         VStack {
             BlockHeightText(height: blockViewModel.block.height)
             ZStack {
-                BlockView(block: blockViewModel,
-                          waveHeight: waveHeight,
-                          waveDuration: waveDuration,
-                          cornerRadius: cornerRadius)
+                BlockBodyView(block: blockViewModel,
+                          configuration: configuration,
+                          animate: animate)
                 
                 BlockTextView(blockViewModel: blockViewModel, currentDate: currentDate)
             }
@@ -31,11 +33,10 @@ struct WBlockView: View {
         .multilineTextAlignment(.center)
     }
     
-    init(blockViewModel: WBlockViewModel, waveHeight: CGFloat, waveDuration: Double, currentDate: Date) {
+    init(blockViewModel: WBlockViewModel, currentDate: Date, animate: Bool) {
         self.blockViewModel = blockViewModel
-        self.waveHeight = waveHeight
-        self.waveDuration = waveDuration
         self.currentDate = currentDate
+        self.animate = animate
     }
 }
 
@@ -48,7 +49,9 @@ fileprivate struct BlockHeightText: View {
     var body: some View {
             Text("# \(height)")
                 .font(.largeTitle)
-                .foregroundColor(colorScheme == .dark ? .white : .black)
+                .foregroundColor(colorScheme == .dark
+                                    ? .white
+                                    : .black)
     }
     
     init(height: Int) {
@@ -56,50 +59,53 @@ fileprivate struct BlockHeightText: View {
     }
 }
 
-fileprivate struct BlockView: View {
-    
-    @State private var waveOffset = Angle.zero
-    private let blockViewModel: WBlockViewModel
-    private let waveHeight: CGFloat
-    private let waveDuration: Double
-    private let cornerRadius: CGFloat
+struct BlockViewConfiguration {
+    let waveHeight: CGFloat
+    let waveDuration: Double
+    let cornerRadius: CGFloat
+}
+
+fileprivate struct BlockBodyView: View {
     
     @Environment(\.colorScheme) private var colorScheme
+    @State private var waveOffset = Angle.zero
+    
+    private let blockViewModel: WBlockViewModel
+    private let configuration: BlockViewConfiguration
+    private let animate: Bool
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(colorScheme == .dark ? Color.black : .white)
+            RoundedRectangle(cornerRadius: configuration.cornerRadius)
+                .fill(colorScheme == .dark ? Color.black : .white )
             
-            WWave(offset: waveOffset, fractionFilled: blockViewModel.fractionFilled, height: waveHeight)
-                .fill(
-                    Color(red: 0,
-                          green: 0.5,
-                          blue: 0.75,
-                          opacity: colorScheme == .dark ? 1 : 0.5)
-                ).clipShape(
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                )
-                .onAppear {
-                    withAnimation(
-                        Animation.linear(duration: 2)
-                                    .repeatForever(autoreverses: false)
-                    ) {
-                        self.waveOffset = Angle(degrees: 360)
-                    }
-                }
+            WWave(offset: waveOffset, fractionFilled: blockViewModel.fractionFilled, height: configuration.waveHeight)
+                .fill(Color("block-wave-color"))
+                .clipShape(RoundedRectangle(cornerRadius: configuration.cornerRadius))
+                .onChange(of: animate) { _ in runAnimation() }
+                .onAppear { runAnimation() }
             
-            RoundedRectangle(cornerRadius: cornerRadius)
+            RoundedRectangle(cornerRadius: configuration.cornerRadius)
                 .stroke(colorScheme == .dark ? Color.gray : .black, lineWidth: 1)
         }
         .aspectRatio(1, contentMode: .fit)
     }
     
-    init(block: WBlockViewModel, waveHeight: CGFloat, waveDuration: Double, cornerRadius: CGFloat) {
+    func runAnimation() {
+        withAnimation(
+            animate
+                ? Animation.linear(duration: 2)
+                           .repeatForever(autoreverses: false)
+                : .linear(duration: 0))
+        {
+            waveOffset = Angle(degrees: animate ? 360 : .zero)
+        }
+    }
+    
+    init(block: WBlockViewModel, configuration: BlockViewConfiguration, animate: Bool) {
         self.blockViewModel = block
-        self.waveHeight = waveHeight
-        self.waveDuration = waveDuration
-        self.cornerRadius = cornerRadius
+        self.configuration = configuration
+        self.animate = animate
     }
 }
 
@@ -140,8 +146,7 @@ struct BlockView_Previews: PreviewProvider {
     
     static var previews: some View {
         let blockViewWidth: CGFloat = 300
-        let waveHeight: CGFloat = 0.02
-        let waveDuration = 1.0
+        let animate = true
         
         let time: WBlock.BlockTime
         
@@ -153,6 +158,7 @@ struct BlockView_Previews: PreviewProvider {
             time = .upcoming(Int.random(in: 1...3))
         }
         
+        
         let block = WBlock(height: Int.random(in: 100_000...500_000),
                            transactionCount: Int.random(in: 1000...3000),
                            averageFee: Int.random(in: 1...300),
@@ -163,9 +169,8 @@ struct BlockView_Previews: PreviewProvider {
         
         return Group {
             WBlockView(blockViewModel: WBlockViewModel(block: block),
-                       waveHeight: waveHeight,
-                       waveDuration: waveDuration,
-                       currentDate: currentDate)
+                       currentDate: currentDate,
+                       animate: animate)
                 
                 .frame(width: blockViewWidth,
                        height: blockViewWidth)
@@ -173,9 +178,8 @@ struct BlockView_Previews: PreviewProvider {
                 .preferredColorScheme(.light)
             
             WBlockView(blockViewModel: WBlockViewModel(block: block),
-                       waveHeight: waveHeight,
-                       waveDuration: waveDuration,
-                       currentDate: currentDate)
+                       currentDate: currentDate,
+                       animate: animate)
                 .frame(width: blockViewWidth,
                        height: blockViewWidth)
                 .previewLayout(.sizeThatFits)
